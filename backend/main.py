@@ -4,7 +4,7 @@ import uuid
 from fastapi import FastAPI, Request, Depends, HTTPException
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.exceptions import RequestValidationError
+from fastapi.exceptions import RequestValidationError, ResponseValidationError
 from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.config import settings
@@ -57,6 +57,14 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
     return JSONResponse(
         status_code=422,
         content={"detail": exc.errors()}
+    )
+
+@app.exception_handler(ResponseValidationError)
+async def response_validation_exception_handler(request: Request, exc: ResponseValidationError):
+    logger.error(f"ResponseValidationError: {exc.errors()}", exc_info=False)
+    return JSONResponse(
+        status_code=500,
+        content={"detail": "Internal Server Error: Response Validation Failed", "errors": exc.errors()}
     )
 
 @app.exception_handler(Exception)

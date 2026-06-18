@@ -31,7 +31,10 @@ class ApprovalRequest(TimestampMixin, UUIDMixin, Base):
     actions: Mapped[List['ReviewAction']] = relationship('ReviewAction', back_populates = 'request', cascade = 'all, delete-orphan')
     
     def __repr__(self = None):
-        return f'''<ApprovalRequest id={self.id} title={self.title} status={self.status}>'''
+        try:
+            return f'''<ApprovalRequest id={self.id} title={self.title} status={self.status}>'''
+        except Exception:
+            return f'''<ApprovalRequest detached>'''
 
 
 from app.models.user import User

@@ -32,8 +32,8 @@ class RequestRepository:
         )
         self.db.add(request)
         await self.db.commit()
-        await self.db.refresh(request)
-        return request
+        self.db.expunge(request)
+        return await self.get_by_id(request.id)
 
     async def get_by_id(self, request_id: uuid.UUID) -> Optional[ApprovalRequest]:
         """Fetch request details by its UUID with eager loaded relation attributes."""
@@ -71,8 +71,8 @@ class RequestRepository:
         """Update request properties and persist state updates."""
         self.db.add(request)
         await self.db.commit()
-        await self.db.refresh(request)
-        return request
+        self.db.expunge(request)
+        return await self.get_by_id(request.id)
 
     async def delete(self, request_id: uuid.UUID) -> bool:
         """Remove a request document from database."""
